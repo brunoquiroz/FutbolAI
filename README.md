@@ -1,7 +1,3 @@
-# FutbolAI
-
-Esta documentación describe las tecnologías, arquitectura y funcionalidades del proyecto FutbolAI, así como instrucciones de instalación, ejecución y futuras mejoras.
-
 ## Descripción General
 
 FutbolAI es una aplicación web construida con Django que permite a usuarios autenticados hacer preguntas sobre fútbol en lenguaje natural. Internamente, el sistema:
@@ -9,6 +5,8 @@ FutbolAI es una aplicación web construida con Django que permite a usuarios aut
 - Genera consultas SQL sobre una base de datos MySQL con información de equipos, jornadas y partidos.
 - Ejecuta esas consultas y presenta los resultados en una tabla.
 - Genera una respuesta en lenguaje natural basada exclusivamente en los datos obtenidos.
+
+<img width="1512" height="860" alt="Captura de pantalla 2025-09-27 a la(s) 2 11 08 a m" src="https://github.com/user-attachments/assets/49785b59-76e2-468c-aff8-63e4a6344963" />
 
 ---
 
