@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutbolAI - Registro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e5e6e8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .register-container {
+            background: #f4f4f6;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #d1d3d6;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .register-header h1 {
+            color: #222;
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-header p {
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #d1d3d6;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #ededf0;
+            color: #222;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #bdbfc2;
+        }
+
+        .form-group input::placeholder {
+            color: #888;
+        }
+
+        .btn-register {
+            width: 100%;
+            background: #bdbfc2;
+            color: #222;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-register:hover {
+            background: #a7a9ac;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #d1d3d6;
+        }
+
+        .login-link p {
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-link a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .login-link a:hover {
+            color: #222;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .success-message {
+            background: #e5e6e8;
+            color: #333;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #d1d3d6;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .messages {
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .message.error {
+            background-color: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background-color: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+
+        .requirements {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .requirements ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .requirements li {
+            margin-bottom: 0.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>⚽ FutbolAI</h1>
+            <p>Únete a nuestra comunidad de fútbol</p>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">Usuario:</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="error-message">{{ form.username.errors.0 }}</div>
+                {% endif %}
+                <div class="requirements">
+                    <ul>
+                        <li>• Máximo 150 caracteres</li>
+                        <li>• Solo letras, números y @/./+/-/_</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password1">Contraseña:</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                <div class="error-message">{{ form.password1.errors.0 }}</div>
+                {% endif %}
+                <div class="requirements">
+                    <ul>
+                        <li>• Mínimo 8 caracteres</li>
+                        <li>• No puede ser muy común</li>
+                        <li>• No puede ser solo números</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password2">Confirmar Contraseña:</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                <div class="error-message">{{ form.password2.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-register">Crear Cuenta</button>
+        </form>
+
+        <div class="login-link">
+            ¿Ya tienes cuenta? <a href="{% url 'chat:login' %}">Inicia sesión aquí</a>
+        </div>
+    </div>
+</body>
+</html> 

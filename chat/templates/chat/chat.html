@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat de Fútbol AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e5e6e8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #f4f4f6;
+            backdrop-filter: none;
+            padding: 1rem 2rem;
+            text-align: center;
+            border-bottom: 1px solid #d1d3d6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #222;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+
+        .header p {
+            color: #555;
+            margin-top: 0.5rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #333;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .btn-logout {
+            background: #e0e1e3;
+            color: #333;
+            border: 1px solid #c1c2c4;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: #d1d3d6;
+            border-color: #b1b3b6;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f4f4f6;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            background: #ededf0;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #d1d3d6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .btn-new-chat {
+            background: #bdbfc2;
+            color: #222;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .btn-new-chat:hover {
+            background: #a7a9ac;
+        }
+
+        .conversations-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .conversation-item {
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .conversation-item:hover {
+            background: #e5e6e8;
+        }
+
+        .conversation-item.active {
+            background: #d1d3d6;
+            border-color: #b1b3b6;
+        }
+
+        .conversation-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .conversation-date {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .conversation-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-delete {
+            background: #bdbfc2;
+            color: #222;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+
+        .btn-delete:hover {
+            background: #a7a9ac;
+        }
+
+        .chat-section {
+            flex: 1;
+            background: #f4f4f6;
+            border-radius: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #ededf0;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #d1d3d6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h2 {
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .chat-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 550px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.2rem;
+            width: 100%;
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        /* Compatibilidad con tipo 'usuario' proveniente del backend */
+        .message.usuario {
+            align-items: flex-end;
+        }
+
+        .message.bot {
+            align-items: flex-start;
+        }
+
+        .message-content {
+            background: #e0e1e3;
+            color: #222;
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+            max-width: 70%;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+            font-size: 1rem;
+            word-break: break-word;
+        }
+
+        .message.user .message-content {
+            background: #bdbfc2;
+            color: #222;
+            /* Esquinas espejadas: más cerrada hacia el lado derecho */
+            border-top-left-radius: 18px;
+            border-bottom-left-radius: 18px;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 8px;
+            /* Forzar alineación a la derecha */
+            margin-left: auto;
+        }
+
+        /* Compatibilidad con tipo 'usuario' proveniente del backend */
+        .message.usuario .message-content {
+            background: #bdbfc2;
+            color: #222;
+            /* Esquinas espejadas: más cerrada hacia el lado derecho */
+            border-top-left-radius: 18px;
+            border-bottom-left-radius: 18px;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 8px;
+            /* Forzar alineación a la derecha */
+            margin-left: auto;
+        }
+
+        .message.bot .message-content {
+            background: #ededf0;
+            color: #222;
+            /* Esquinas espejadas: más cerrada hacia el lado izquierdo */
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 18px;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 18px;
+            /* Forzar alineación a la izquierda */
+            margin-right: auto;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 0.5rem;
+            padding: 0 0.5rem;
+        }
+
+        /* Alinear timestamp con el lado del mensaje */
+        .message.user .message-time,
+        .message.usuario .message-time {
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .message.bot .message-time {
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        .chat-input {
+            padding: 1.5rem;
+            border-top: 1px solid #d1d3d6;
+            background: #ededf0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #d1d3d6;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #f4f4f6;
+            color: #222;
+        }
+
+        .message-input:focus {
+            border-color: #bdbfc2;
+        }
+
+        .send-btn {
+            background: #bdbfc2;
+            color: #222;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+
+        .send-btn:hover {
+            background: #a7a9ac;
+        }
+
+        .send-btn:disabled {
+            background: #d1d3d6;
+            cursor: not-allowed;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ededf0;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #d1d3d6;
+        }
+
+        .data-table th {
+            background: #bdbfc2;
+            color: #222;
+            font-weight: 600;
+        }
+
+        .data-table tr:hover {
+            background: #e5e6e8;
+        }
+
+        .google-search-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .google-search-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .google-search-link:visited {
+            color: #6f42c1;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+        }
+
+        .spinner {
+            border: 3px solid #e0e1e3;
+            border-top: 3px solid #bdbfc2;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 1rem;
+        }
+
+        .no-conversation {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+
+        .no-conversation h3 {
+            margin-bottom: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .chat-messages {
+                max-height: 400px;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 0;
+            border: 1px solid #888;
+            width: 90vw;
+            max-width: 900px;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-content iframe {
+            border-radius: 0 0 10px 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 20px 0 0;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            top: 0;
+            z-index: 10;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-content">
+            <h1>Chat de Fútbol AI</h1>
+            <p>Pregunta sobre equipos, partidos y estadísticas de fútbol de la temporada 2023 - 2024</p>
+        </div>
+        <div class="user-info">
+            <span class="user-name">{{ user.username }}</span>
+            <a href="{% url 'chat:logout' %}" class="btn-logout">Cerrar Sesión</a>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Sidebar con conversaciones -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Conversaciones</h2>
+                <button class="btn-new-chat" onclick="crearNuevaConversacion()">Nueva</button>
+            </div>
+            <div class="conversations-list" id="conversationsList" style="max-height: 350px; overflow-y: auto;">
+                <!-- Las conversaciones se cargarán aquí -->
+            </div>
+        </div>
+
+        <!-- Área principal del chat -->
+        <div class="chat-section">
+            <div class="chat-header">
+                <h2 id="chatTitle">Conversación</h2>
+                <!-- <button class="btn-clear" onclick="limpiarHistorial()">Limpiar Chat</button> -->
+            </div>
+
+            <div class="chat-content">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="no-conversation">
+                        <h3>¡Bienvenido al Chat de Fútbol AI!</h3>
+                        <p>Crea una nueva conversación o selecciona una existente para comenzar.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Procesando tu pregunta...</p>
+            </div>
+
+            <div class="chat-input">
+                <div class="input-group">
+                    <input type="text" class="message-input" id="messageInput"
+                        placeholder="Escribe tu pregunta sobre fútbol..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="enviarMensaje()" id="sendBtn">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para búsqueda en Google -->
+    <div id="googleModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <iframe id="googleIframe" src="" frameborder="0" style="width:100%;height:80vh;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        let isLoading = false;
+        let conversacionActual = null;
+        // Lista de términos excluidos, editable por el usuario
+        let terminosExcluidos = JSON.parse(localStorage.getItem('terminosExcluidos') || '["prohibido","ejemplo","test"]');
+
+        // Cargar conversaciones al iniciar
+        window.addEventListener('load', function () {
+            cargarConversaciones();
+        });
+
+        // Cargar conversaciones
+        async function cargarConversaciones() {
+            try {
+                const response = await fetch('/chat/api/conversaciones/');
+                const data = await response.json();
+
+                const conversationsList = document.getElementById('conversationsList');
+                conversationsList.innerHTML = '';
+
+                if (data.conversaciones && data.conversaciones.length > 0) {
+                    data.conversaciones.forEach(conv => {
+                        const convElement = crearElementoConversacion(conv);
+                        conversationsList.appendChild(convElement);
+                    });
+                } else {
+                    conversationsList.innerHTML = '<p style="text-align: center; color: #6c757d; padding: 1rem;">No hay conversaciones</p>';
+                }
+            } catch (error) {
+                console.error('Error al cargar conversaciones:', error);
+            }
+        }
+
+        // Crear elemento de conversación
+        function crearElementoConversacion(conversacion) {
+            const div = document.createElement('div');
+            div.className = 'conversation-item';
+            div.setAttribute('data-id', conversacion.id);
+
+            const fecha = new Date(conversacion.fecha_ultima_actividad).toLocaleDateString('es-ES');
+
+            div.innerHTML = `
+                <div class="conversation-title">${conversacion.titulo}</div>
+                <div class="conversation-date">${fecha} - ${conversacion.total_mensajes} mensajes</div>
+                <div class="conversation-actions">
+                    <button class="btn-delete" onclick="eliminarConversacion(${conversacion.id})">Eliminar</button>
+                </div>
+            `;
+
+            div.addEventListener('click', function (e) {
+                if (!e.target.classList.contains('btn-delete')) {
+                    seleccionarConversacion(conversacion.id);
+                }
+            });
+
+            return div;
+        }
+
+        // Seleccionar conversación
+        async function seleccionarConversacion(conversacionId) {
+            try {
+                const response = await fetch(`/chat/api/conversaciones/${conversacionId}/`);
+                const data = await response.json();
+
+                if (data.conversacion) {
+                    conversacionActual = data.conversacion;
+                    document.getElementById('chatTitle').textContent = `💬 ${data.conversacion.titulo}`;
+
+                    // Cargar mensajes
+                    cargarMensajesConversacion(data.conversacion.mensajes);
+
+                    // Mostrar panel de términos excluidos
+                    mostrarPanelExcluidos(true);
+
+                    // Actualizar UI
+                    document.querySelectorAll('.conversation-item').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    document.querySelector(`[data-id="${conversacionId}"]`).classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error al cargar conversación:', error);
+            }
+        }
+
+        // Cargar mensajes de una conversación
+        function cargarMensajesConversacion(mensajes) {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+
+            if (mensajes && mensajes.length > 0) {
+                mensajes.forEach(msg => {
+                    agregarMensaje(msg.contenido, msg.tipo, false, msg.resultados_json);
+                });
+            } else {
+                chatMessages.innerHTML = `
+                    <div class="message bot">
+                        <div class="message-content">
+                            ¡Hola! Soy tu asistente de fútbol. Puedes preguntarme sobre equipos, partidos, estadísticas y más. ¿En qué puedo ayudarte?
+                        </div>
+                        <div class="message-time" id="currentTime"></div>
+                    </div>
+                `;
+            }
+        }
+
+        // Crear nueva conversación
+        async function crearNuevaConversacion() {
+            try {
+                const formData = new FormData();
+                formData.append('titulo', 'Nueva conversación');
+
+                const response = await fetch('/chat/api/conversaciones/crear/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.conversacion_id) {
+                    // Recargar conversaciones
+                    await cargarConversaciones();
+
+                    // Seleccionar la nueva conversación
+                    await seleccionarConversacion(data.conversacion_id);
+                }
+            } catch (error) {
+                console.error('Error al crear conversación:', error);
+            }
+        }
+
+        // Eliminar conversación
+        async function eliminarConversacion(conversacionId) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta conversación?')) {
+                try {
+                    const response = await fetch('/chat/api/conversaciones/eliminar/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ conversacion_id: conversacionId })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.mensaje) {
+                        // Si era la conversación actual, limpiar
+                        if (conversacionActual && conversacionActual.id === conversacionId) {
+                            conversacionActual = null;
+                            document.getElementById('chatTitle').textContent = '💬 Conversación';
+                            document.getElementById('chatMessages').innerHTML = `
+                                <div class="no-conversation">
+                                    <h3>¡Bienvenido al Chat de Fútbol AI!</h3>
+                                    <p>Crea una nueva conversación o selecciona una existente para comenzar.</p>
+                                </div>
+                            `;
+                            // Ocultar panel de términos excluidos
+                            mostrarPanelExcluidos(false);
+                        }
+
+                        // Recargar conversaciones
+                        await cargarConversaciones();
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar conversación:', error);
+                }
+            }
+        }
+
+        // Manejar tecla Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !isLoading) {
+                enviarMensaje();
+            }
+        }
+
+        // Enviar mensaje
+        async function enviarMensaje() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message || isLoading) return;
+
+            // Si no hay conversación actual, crear una nueva
+            if (!conversacionActual) {
+                await crearNuevaConversacion();
+                // Esperar un momento para que se cree la conversación
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // Agregar mensaje del usuario
+            agregarMensaje(message, 'user');
+            input.value = '';
+
+            // Mostrar loading
+            mostrarLoading(true);
+
+            try {
+                const response = await fetch('/chat/api/procesar/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mensaje: message,
+                        conversacion_id: conversacionActual ? conversacionActual.id : null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    agregarMensaje(data.error, 'bot');
+                } else if (data.mensaje) {
+                    agregarMensaje(data.mensaje, 'bot');
+                } else {
+                    agregarMensaje(data.respuesta, 'bot', true, data.resultados);
+                }
+
+                // Actualizar conversación actual si se creó una nueva
+                if (data.conversacion_id && !conversacionActual) {
+                    await seleccionarConversacion(data.conversacion_id);
+                }
+
+                // Recargar conversaciones para mostrar la actualización
+                await cargarConversaciones();
+
+            } catch (error) {
+                agregarMensaje('Error al procesar el mensaje. Inténtalo de nuevo.', 'bot');
+                console.error('Error:', error);
+            } finally {
+                mostrarLoading(false);
+            }
+        }
+
+        // Agregar mensaje al chat
+        function agregarMensaje(content, type, scroll = true, resultados = null) {
+            const chatMessages = document.getElementById('chatMessages');
+
+            // Remover mensaje de bienvenida si existe
+            const noConversation = chatMessages.querySelector('.no-conversation');
+            if (noConversation) {
+                noConversation.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('es-ES');
+
+            let messageContent = `<div class="message-content">${content}</div>`;
+
+            // Si hay resultados y es un mensaje del bot, agregar la tabla y botón de búsqueda
+            if (resultados && type === 'bot' && resultados.length > 0) {
+                const headers = Object.keys(resultados[0]);
+                const tableHTML = `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                ${headers.map(header => `<th>${header}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${resultados.map(row => `
+                                <tr>
+                                    ${headers.map(header => {
+                    if (header === 'jornada') {
+                        const searchQuery = generarBusquedaGoogle(row, 'partido');
+                        return `<td><a href="#" class="google-search-link" data-search-url="${searchQuery}">Matchday</a></td>`;
+                    } else {
+                        const value = row[header];
+                        return `<td>${value !== null && value !== undefined ? value : ''}</td>`;
+                    }
+                }).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                messageContent += tableHTML;
+            }
+
+            messageDiv.innerHTML = messageContent + `<div class="message-time">${timeString}</div>`;
+
+            chatMessages.appendChild(messageDiv);
+            if (scroll) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Delegar evento para los enlaces de búsqueda en Google (debe estar aquí)
+            setTimeout(() => {
+                messageDiv.querySelectorAll('.google-search-link').forEach(link => {
+                    link.onclick = function (e) {
+                        e.preventDefault();
+                        const url = this.getAttribute('data-search-url');
+                        abrirModalGoogle(url);
+                    };
+                });
+            }, 50);
+        }
+
+        // Generar URL de búsqueda en Google
+        function generarBusquedaGoogle(resultado, tipo) {
+            let searchTerms = [];
+
+            if (tipo === 'partido') {
+                // Agregar equipos si están disponibles
+                if (resultado.equipo_local) {
+                    searchTerms.push(resultado.equipo_local);
+                }
+                if (resultado.equipo_visita) {
+                    searchTerms.push(resultado.equipo_visita);
+                }
+
+                // Agregar fecha si está disponible
+                if (resultado.fecha) {
+                    searchTerms.push(resultado.fecha);
+                }
+
+                // Agregar jornada si está disponible para hacer la búsqueda más específica
+                if (resultado.jornada) {
+                    searchTerms.push(resultado.jornada);
+                }
+            }
+            else if (tipo === 'equipo') {
+                // Agregar nombre del equipo
+                if (resultado.nombre) {
+                    searchTerms.push(resultado.nombre);
+                }
+            }
+
+            const query = searchTerms.join(' ');
+            const encodedQuery = encodeURIComponent(query);
+
+            return `https://www.google.com/search?q=${encodedQuery}`;
+        }
+
+        // Mostrar/ocultar loading
+        function mostrarLoading(show) {
+            isLoading = show;
+            const loading = document.getElementById('loading');
+            const sendBtn = document.getElementById('sendBtn');
+
+            if (show) {
+                loading.style.display = 'block';
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'Enviando...';
+            } else {
+                loading.style.display = 'none';
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Enviar';
+            }
+        }
+
+        // Función para abrir el modal de Google
+        function abrirModalGoogle(url) {
+            // Decodificar la query para analizar los términos
+            const urlObj = new URL(url);
+            const query = decodeURIComponent(urlObj.searchParams.get('q') || '');
+            // Verificar si algún término excluido está presente (insensible a mayúsculas)
+            const contieneExcluido = terminosExcluidos.some(t => query.toLowerCase().includes(t.toLowerCase()));
+            if (contieneExcluido) {
+                // Mostrar mensaje en el chat en vez de alert
+                agregarMensaje(
+                    'La búsqueda fue bloqueada porque contiene un término excluido por el usuario. Puedes revisar o modificar la lista de términos excluidos en el panel de la esquina.',
+                    'bot',
+                    true
+                );
+                return;
+            }
+            // Tamaño de ventana tipo modal
+            const width = 900;
+            const height = 700;
+            const left = (window.screen.width / 2) - (width / 2);
+            const top = (window.screen.height / 2) - (height / 2);
+            window.open(url, '_blank', `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+        }
+        // Cerrar modal
+        document.getElementById('closeModal').onclick = function () {
+            document.getElementById('googleModal').style.display = 'none';
+            document.getElementById('googleIframe').src = '';
+        };
+        // Cerrar modal al hacer click fuera del contenido
+        window.onclick = function (event) {
+            const modal = document.getElementById('googleModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+                document.getElementById('googleIframe').src = '';
+            }
+        };
+
+        function actualizarPanelExcluidos() {
+            const ul = document.getElementById('excluidos-list');
+            ul.innerHTML = '';
+            terminosExcluidos.forEach((t, idx) => {
+                const li = document.createElement('li');
+                li.style.display = 'flex';
+                li.style.alignItems = 'center';
+                li.style.justifyContent = 'space-between';
+                li.style.marginBottom = '0.3rem';
+                li.innerHTML = `<span>${t}</span><button class="btn-eliminar-excluido" data-idx="${idx}" style="background:#dc3545;color:white;border:none;border-radius:4px;padding:0.2rem 0.6rem;cursor:pointer;font-size:0.9rem;">Eliminar</button>`;
+                ul.appendChild(li);
+            });
+        }
+        // Delegación de eventos para eliminar términos
+        const excluidosList = document.getElementById('excluidos-list');
+        excluidosList.addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-eliminar-excluido')) {
+                const idx = parseInt(e.target.getAttribute('data-idx'));
+                if (!isNaN(idx)) {
+                    terminosExcluidos.splice(idx, 1);
+                    localStorage.setItem('terminosExcluidos', JSON.stringify(terminosExcluidos));
+                    actualizarPanelExcluidos();
+                }
+            }
+        });
+        document.getElementById('btn-agregar-excluido').onclick = function () {
+            const input = document.getElementById('nuevo-excluido');
+            const val = input.value.trim();
+            if (val && !terminosExcluidos.includes(val)) {
+                terminosExcluidos.push(val);
+                localStorage.setItem('terminosExcluidos', JSON.stringify(terminosExcluidos));
+                actualizarPanelExcluidos();
+                input.value = '';
+            }
+        };
+        document.getElementById('nuevo-excluido').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') document.getElementById('btn-agregar-excluido').click();
+        });
+        actualizarPanelExcluidos();
+
+        // Mostrar/ocultar el panel de términos excluidos según si hay conversación activa
+        function mostrarPanelExcluidos(show) {
+            const panel = document.getElementById('excluidos-panel');
+            if (panel) {
+                panel.style.display = show ? 'block' : 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

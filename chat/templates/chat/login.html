@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FutbolAI - Iniciar Sesión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e5e6e8;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: #f4f4f6;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #d1d3d6;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: #222;
+            font-size: 2rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #555;
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #d1d3d6;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #ededf0;
+            color: #222;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #bdbfc2;
+        }
+
+        .form-group input::placeholder {
+            color: #888;
+        }
+
+        .btn-login {
+            width: 100%;
+            background: #bdbfc2;
+            color: #222;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-login:hover {
+            background: #a7a9ac;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #d1d3d6;
+        }
+
+        .register-link p {
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-link a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .register-link a:hover {
+            color: #222;
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .success-message {
+            background: #e5e6e8;
+            color: #333;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #d1d3d6;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .messages {
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .message.error {
+            background-color: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background-color: #efe;
+            color: #363;
+            border: 1px solid #cfc;
+        }
+
+        .admin-link {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .admin-link a {
+            color: #999;
+            text-decoration: none;
+        }
+
+        .admin-link a:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>⚽ FutbolAI</h1>
+            <p>Tu asistente inteligente de fútbol</p>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">Usuario:</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <div class="error-message">{{ form.username.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">Contraseña:</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                <div class="error-message">{{ form.password.errors.0 }}</div>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn-login">Iniciar Sesión</button>
+        </form>
+
+        <div class="register-link">
+            ¿No tienes cuenta? <a href="{% url 'chat:registro' %}">Regístrate aquí</a>
+        </div>
+
+        <div class="admin-link">
+            <a href="{% url 'admin:login' %}">Acceso Administrador</a>
+        </div>
+    </div>
+</body>
+</html> 
