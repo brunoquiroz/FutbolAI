@@ -5,21 +5,34 @@ from tabulate import tabulate
 import re
 import json
 from datetime import date, datetime
+from dotenv import load_dotenv
 from .models import Conversacion, Mensaje, PromptExtra
 from django.conf import settings
 
+load_dotenv()
+
 # Configuración de API: primero desde settings, luego variables de entorno y, por último, valores por defecto
 API_BASE_URL = getattr(settings, 'API_BASE_URL', os.environ.get('API_BASE_URL', 'http://127.0.0.1:1337/v1'))
-API_KEY = getattr(settings, 'API_KEY', os.environ.get('API_KEY', 'hola'))
+API_KEY = getattr(settings, 'API_KEY', os.environ.get('API_KEY'))
 API_MODEL = getattr(settings, 'API_MODEL', os.environ.get('API_MODEL', 'DeepSeek-R1-0528-Qwen3-8B-IQ4_XS'))
 
-# CONFIGURACIÓN DE BASE DE DATOS 
+if not API_KEY:
+    raise RuntimeError(
+        "API_KEY no está configurada. Defínela como variable de entorno o en settings.py."
+    )
+
+# CONFIGURACIÓN DE BASE DE DATOS: se toma exclusivamente de variables de entorno
 db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'REDACTED',
-    'database': 'ligas'
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'user': os.environ.get('DB_USER', 'root'),
+    'password': os.environ.get('DB_PASSWORD'),
+    'database': os.environ.get('DB_NAME', 'ligas'),
 }
+
+if not db_config['password']:
+    raise RuntimeError(
+        "DB_PASSWORD no está configurada. Defínela como variable de entorno."
+    )
 
 def convertir_a_json_serializable(obj):
     """Convierte objetos de la base de datos a formato JSON serializable"""
